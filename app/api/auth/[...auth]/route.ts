@@ -15,59 +15,35 @@ export async function GET(request: Request) {
 
   if (url.pathname === "/api/auth/callback") {
     const code = url.searchParams.get("code");
-    if (!code) {
-      console.log("No code found");
-      return NextResponse.json({ error: "No code found" });
-    }
-  
-    // Log token request payload
-    const payload = {
-      code,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      redirect_uri: REDIRECT_URI,
-      grant_type: "authorization_code",
-    };
-    console.log("Token Request Payload:", payload);
-  
+    if (!code) return NextResponse.json({ error: "No code found" });
+
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        code,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: "authorization_code",
+      }),
     });
-  
     const tokenData = await tokenResponse.json();
-  
-    console.log("Token Response:", tokenData);
-  
-    if (tokenData.error) {
-      console.error("Error fetching token:", tokenData);
-      return NextResponse.json({ error: tokenData.error, description: tokenData.error_description });
-    }
-  
+
     const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
-  
     const userInfo = await userInfoResponse.json();
-  
-    console.log("User Info Response:", userInfo);
-  
-    if (userInfo.error) {
-      console.error("Error fetching user info:", userInfo);
-      return NextResponse.json({ error: userInfo.error, description: userInfo.error_description });
-    }
-  
+
     cookies().set("session", JSON.stringify(userInfo), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * 24,
     });
-  
+
     return NextResponse.redirect(new URL("/user", request.url).toString());
   }
-  
 
   return NextResponse.json({ error: "Unsupported route" });
 }
