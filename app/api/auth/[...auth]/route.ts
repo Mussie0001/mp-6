@@ -37,7 +37,8 @@ export async function GET(request: Request) {
 
     cookies().set("session", JSON.stringify(userInfo), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "lax",
       maxAge: 60 * 60 * 24,
     });
 
