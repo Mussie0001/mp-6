@@ -8,7 +8,7 @@ export default function UserPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const response = await fetch("/api/auth/user");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/user`);
       const data = await response.json();
       setUser(data.user);
     };
