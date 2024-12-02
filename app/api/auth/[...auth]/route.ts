@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-const REDIRECT_URI = "http://localhost:3000/api/auth/callback";
+const REDIRECT_URI = "http://mp-6-three.vercel.app/api/auth/callback";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
